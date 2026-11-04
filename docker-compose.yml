@@ -1,0 +1,20 @@
+# Local Postgres (with pgvector, for semantic task search) + Redis matching .env.example
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: tasklume
+      POSTGRES_PASSWORD: tasklume
+      POSTGRES_DB: tasklume
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
