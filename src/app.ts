@@ -51,15 +51,20 @@ app.use(
 // === CORS ===
 const allowedOrigins = [config.FRONTEND_URL];
 
+const isDevToolOrigin = (origin: string) =>
+  config.NODE_ENV !== "production" && /^(chrome|moz)-extension:\/\//.test(origin);
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, server-to-server)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes(origin) || isDevToolOrigin(origin)) {
       callback(null, true);
     } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      // Deny without throwing: the response just lacks CORS headers (browser
+      // blocks it) instead of turning into a 500 through the error handler
+      callback(null, false);
     }
   },
   credentials: true,  // Allow cookies/auth headers
